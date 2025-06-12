@@ -483,8 +483,6 @@ class Agent:
             tool_args['firebase_token'] = firebase_token
             
             try:
-                # --- THIS IS THE FINAL FIX ---
-                # Call the tool's underlying function directly to bypass the schema check
                 result = self.tools[t['name']].func(**tool_args)
                 # --- END OF FIX ---
                 
