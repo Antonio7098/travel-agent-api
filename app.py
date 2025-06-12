@@ -74,24 +74,24 @@ class CreateTripInput(BaseModel):
     startDate: str = Field(description="The start date of the trip in 'YYYY-MM-DD' format.")
     endDate: str = Field(description="The end date of the trip in 'YYYY-MM-DD' format.")
 
-class SearchFlightsInput(BaseModel):
-    originLocationCode: str = Field(description="The IATA code for the departure airport, e.g., 'LHR' for London Heathrow.")
-    destinationLocationCode: str = Field(description="The IATA code for the arrival airport, e.g., 'CDG' for Paris Charles de Gaulle.")
-    departureDate: str = Field(description="The desired departure date in 'YYYY-MM-DD' format.")
-    adults: int = Field(description="The number of adult passengers traveling.", default=1)
-    returnDate: Optional[str] = Field(description="The return date in 'YYYY-MM-DD' format. Required for a round-trip flight.", default=None)
-    nonStop: Optional[bool] = Field(description="Set to true to search for non-stop flights only.", default=False)
+# class SearchFlightsInput(BaseModel):
+#     originLocationCode: str = Field(description="The IATA code for the departure airport, e.g., 'LHR' for London Heathrow.")
+#     destinationLocationCode: str = Field(description="The IATA code for the arrival airport, e.g., 'CDG' for Paris Charles de Gaulle.")
+#     departureDate: str = Field(description="The desired departure date in 'YYYY-MM-DD' format.")
+#     adults: int = Field(description="The number of adult passengers traveling.", default=1)
+#     returnDate: Optional[str] = Field(description="The return date in 'YYYY-MM-DD' format. Required for a round-trip flight.", default=None)
+#     nonStop: Optional[bool] = Field(description="Set to true to search for non-stop flights only.", default=False)
 
-class SearchHotelsInput(BaseModel):
-    cityCode: str = Field(description="The IATA city code for where the user wants to find hotels, e.g., 'PAR' for Paris.")
-    radius: int = Field(description="The radius around the city center to search for hotels, in kilometers.", default=5)
-    checkInDate: Optional[str] = Field(description="The check-in date in 'YYYY-MM-DD' format.", default=None)
-    checkOutDate: Optional[str] = Field(description="The check-out date in 'YYYY-MM-DD' format.", default=None)
+# class SearchHotelsInput(BaseModel):
+#     cityCode: str = Field(description="The IATA city code for where the user wants to find hotels, e.g., 'PAR' for Paris.")
+#     radius: int = Field(description="The radius around the city center to search for hotels, in kilometers.", default=5)
+#     checkInDate: Optional[str] = Field(description="The check-in date in 'YYYY-MM-DD' format.", default=None)
+#     checkOutDate: Optional[str] = Field(description="The check-out date in 'YYYY-MM-DD' format.", default=None)
 
-class SearchActivitiesInput(BaseModel):
-    latitude: float = Field(description="The latitude for the center of the search area. e.g., 48.8566 for Paris.")
-    longitude: float = Field(description="The longitude for the center of the search area. e.g., 2.3522 for Paris.")
-    radius: int = Field(description="The radius around the coordinates to search for activities, in kilometers.", default=1)
+# class SearchActivitiesInput(BaseModel):
+#     latitude: float = Field(description="The latitude for the center of the search area. e.g., 48.8566 for Paris.")
+#     longitude: float = Field(description="The longitude for the center of the search area. e.g., 2.3522 for Paris.")
+#     radius: int = Field(description="The radius around the coordinates to search for activities, in kilometers.", default=1)
 
 class GetItineraryInput(BaseModel):
     tripId: str = Field(description="The unique ID of the trip for which to get the daily itinerary.")
@@ -253,69 +253,69 @@ def create_trip(tripName: str, location: str, startDate: str, endDate: str, fire
         print(f"An unexpected error occurred in create_trip: {e}")
         return f"An unexpected error occurred while creating the trip: {str(e)}"
 
-@tool(args_schema=SearchFlightsInput)
-def search_flights(originLocationCode: str, destinationLocationCode: str, departureDate: str, firebase_token: str, adults: int = 1, returnDate: str = None, nonStop: bool = False) -> str:
-    """Searches for flight offers using the Amadeus API via the backend."""
-    print(f"--- Calling Tool: search_flights from {originLocationCode} to {destinationLocationCode} ---")
-    try:
-        headers = {"Authorization": f"Bearer {firebase_token}"}
-        params = {
-            "originLocationCode": originLocationCode,
-            "destinationLocationCode": destinationLocationCode,
-            "departureDate": departureDate,
-            "adults": adults,
-            # ✅ FIX: Convert the boolean to its lowercase string representation
-            "nonStop": str(nonStop).lower(),
-            "max": 5,
-        }
-        if returnDate:
-            params["returnDate"] = returnDate
+# @tool(args_schema=SearchFlightsInput)
+# def search_flights(originLocationCode: str, destinationLocationCode: str, departureDate: str, firebase_token: str, adults: int = 1, returnDate: str = None, nonStop: bool = False) -> str:
+#     """Searches for flight offers using the Amadeus API via the backend."""
+#     print(f"--- Calling Tool: search_flights from {originLocationCode} to {destinationLocationCode} ---")
+#     try:
+#         headers = {"Authorization": f"Bearer {firebase_token}"}
+#         params = {
+#             "originLocationCode": originLocationCode,
+#             "destinationLocationCode": destinationLocationCode,
+#             "departureDate": departureDate,
+#             "adults": adults,
+#             # ✅ FIX: Convert the boolean to its lowercase string representation
+#             "nonStop": str(nonStop).lower(),
+#             "max": 5,
+#         }
+#         if returnDate:
+#             params["returnDate"] = returnDate
             
-        response = requests.get("http://localhost:3001/api/amadeus/flights", headers=headers, params=params, timeout=20)
-        response.raise_for_status()
-        return json.dumps(response.json())
-    except requests.exceptions.RequestException as e:
-        return f"Error: Could not search for flights. The server said: {str(e)}"
+#         response = requests.get("http://localhost:3001/api/amadeus/flights", headers=headers, params=params, timeout=20)
+#         response.raise_for_status()
+#         return json.dumps(response.json())
+#     except requests.exceptions.RequestException as e:
+#         return f"Error: Could not search for flights. The server said: {str(e)}"
 
-@tool(args_schema=SearchHotelsInput)
-def search_hotels_by_city(cityCode: str, firebase_token: str, radius: int = 5, checkInDate: str = None, checkOutDate: str = None) -> str:
-    """Searches for hotels in a city using the Amadeus API via the backend."""
-    print(f"--- Calling Tool: search_hotels_by_city for {cityCode} ---")
-    try:
-        headers = {"Authorization": f"Bearer {firebase_token}"}
-        params = {
-            "cityCode": cityCode, 
-            "radius": radius,
-            "pageSize": 5,
-        }
-        if checkInDate:
-            params["checkInDate"] = checkInDate
-        if checkOutDate:
-            params["checkOutDate"] = checkOutDate
+# @tool(args_schema=SearchHotelsInput)
+# def search_hotels_by_city(cityCode: str, firebase_token: str, radius: int = 5, checkInDate: str = None, checkOutDate: str = None) -> str:
+#     """Searches for hotels in a city using the Amadeus API via the backend."""
+#     print(f"--- Calling Tool: search_hotels_by_city for {cityCode} ---")
+#     try:
+#         headers = {"Authorization": f"Bearer {firebase_token}"}
+#         params = {
+#             "cityCode": cityCode, 
+#             "radius": radius,
+#             "pageSize": 5,
+#         }
+#         if checkInDate:
+#             params["checkInDate"] = checkInDate
+#         if checkOutDate:
+#             params["checkOutDate"] = checkOutDate
 
-        response = requests.get("http://localhost:3001/api/amadeus/hotels", headers=headers, params=params, timeout=20)
-        response.raise_for_status()
-        return json.dumps(response.json())
-    except requests.exceptions.RequestException as e:
-        return f"Error: Could not search for hotels. The server said: {str(e)}"
+#         response = requests.get("http://localhost:3001/api/amadeus/hotels", headers=headers, params=params, timeout=20)
+#         response.raise_for_status()
+#         return json.dumps(response.json())
+#     except requests.exceptions.RequestException as e:
+#         return f"Error: Could not search for hotels. The server said: {str(e)}"
 
-@tool(args_schema=SearchActivitiesInput)
-def search_activities_by_location(latitude: float, longitude: float, firebase_token: str, radius: int = 1) -> str:
-    """Searches for tours and activities near a specific location using the Amadeus API via the backend."""
-    print(f"--- Calling Tool: search_activities_by_location ---")
-    try:
-        headers = {"Authorization": f"Bearer {firebase_token}"}
-        params = {
-            "latitude": latitude, 
-            "longitude": longitude, 
-            "radius": radius,
-            "pageSize": 5,
-        }
-        response = requests.get("http://localhost:3001/api/amadeus/activities", headers=headers, params=params, timeout=20)
-        response.raise_for_status()
-        return json.dumps(response.json())
-    except requests.exceptions.RequestException as e:
-        return f"Error: Could not search for activities. The server said: {str(e)}"
+# @tool(args_schema=SearchActivitiesInput)
+# def search_activities_by_location(latitude: float, longitude: float, firebase_token: str, radius: int = 1) -> str:
+#     """Searches for tours and activities near a specific location using the Amadeus API via the backend."""
+#     print(f"--- Calling Tool: search_activities_by_location ---")
+#     try:
+#         headers = {"Authorization": f"Bearer {firebase_token}"}
+#         params = {
+#             "latitude": latitude, 
+#             "longitude": longitude, 
+#             "radius": radius,
+#             "pageSize": 5,
+#         }
+#         response = requests.get("http://localhost:3001/api/amadeus/activities", headers=headers, params=params, timeout=20)
+#         response.raise_for_status()
+#         return json.dumps(response.json())
+#     except requests.exceptions.RequestException as e:
+#         return f"Error: Could not search for activities. The server said: {str(e)}"
 
 @tool(args_schema=GetItineraryInput)
 def get_trip_itinerary(tripId: str, firebase_token: str) -> str:
@@ -523,9 +523,9 @@ def chat_with_agent():
             add_activity_to_trip, 
             add_flight_to_trip, 
             create_trip, 
-            search_activities_by_location, 
-            search_flights, 
-            search_hotels_by_city, 
+            # search_activities_by_location, 
+            # search_flights, 
+            # search_hotels_by_city, 
             get_trip_itinerary, 
             TavilySearchResults
         ]
