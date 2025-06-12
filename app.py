@@ -47,12 +47,6 @@ class AccomCheckInput(BaseModel):
 class ActivityCheckInput(BaseModel):
     tripId: str = Field(description="The unique ID of the trip to check activities for.")
 
-class CreateTripInput(BaseModel):
-    tripName: str = Field(description="The name of the trip, for example 'Summer Holiday' or 'Work Conference'.")
-    location: str = Field(description="The primary city or destination for the trip, for example 'Paris, France'.")
-    startDate: str = Field(description="The start date of the trip in 'YYYY-MM-DD' format.")
-    endDate: str = Field(description="The end date of the trip in 'YYYY-MM-DD' format.")
-
 class AddFlightInput(BaseModel):
     tripId: str = Field(description="The unique ID of the trip to which this flight should be added.")
     airline: str = Field(description="The name of the airline, for example 'British Airways'.")
