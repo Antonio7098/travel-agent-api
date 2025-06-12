@@ -1,3 +1,4 @@
+print("✅✅✅ --- RUNNING LATEST DEPLOYMENT CODE --- ✅✅✅")
 from dotenv import load_dotenv
 _ = load_dotenv()
 
