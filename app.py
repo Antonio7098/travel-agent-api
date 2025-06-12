@@ -155,25 +155,6 @@ def check_activities(tripId: str, firebase_token: str):
     except requests.exceptions.RequestException as e:
         return f"Error: Could not retrieve activity information. The server said: {str(e)}"
 
-@tool(args_schema=CreateTripInput)
-def create_trip(tripName: str, location: str, startDate: str, endDate: str, firebase_token: str) -> str:
-    """Creates a new trip for the user."""
-    print(f"--- Calling Tool: create_trip for {tripName} ---")
-    try:
-        headers = {"Content-Type": "application/json", "Authorization": f"Bearer {firebase_token}"}
-        payload = {
-            "tripName": tripName,
-            "location": location,
-            "startDate": startDate,
-            "endDate": endDate,
-        }
-        response = requests.post("http://localhost:3001/api/trips", headers=headers, json=payload, timeout=10)
-        response.raise_for_status()
-        trip_id = response.json().get('id', 'Unknown ID')
-        return f"Successfully created the trip '{tripName}' to {location}. The new trip ID is {trip_id}."
-    except requests.exceptions.RequestException as e:
-        return f"Error: Could not create the trip. The server said: {e}"
-
 @tool(args_schema=AddFlightInput)
 def add_flight_to_trip(tripId: str, airline: str, flightNumber: str, departureTime: str, arrivalTime: str, firebase_token: str) -> str:
     """Adds a flight to a specific trip using its ID."""
